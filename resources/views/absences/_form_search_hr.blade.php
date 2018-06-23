@@ -16,7 +16,7 @@
                                 <button type="button"
                                         class="btn width-100">{{trans('employee.profile_info.id')}}</button>
                             </div>
-                            {{ Form::text('id', old('id'),
+                            {{ Form::text('id', request()->get('id'),
                                 ['class' => 'form-control',
                                 'id' => 'employeeId',
                                 'autofocus' => false,
@@ -29,7 +29,7 @@
                                         class="btn width-100">{{trans('employee.profile_info.long_name')}}</button>
                             </div>
                             {{--<input type="text" name="name" id="nameEmployee" class="form-control">--}}
-                            {{ Form::text('name', old('name'),
+                            {{ Form::text('name', request()->get('name'),
                                 ['class' => 'form-control',
                                 'id' => 'nameEmployee',
                                 'autofocus' => false,
@@ -44,7 +44,7 @@
                                         class="btn width-100">{{trans('employee.profile_info.email')}}</button>
                             </div>
                             {{--<input type="text" name="email" id="emailEmployee" class="form-control">--}}
-                            {{ Form::text('email', old('email'),
+                            {{ Form::text('email', request()->get('email'),
                                 ['class' => 'form-control',
                                 'id' => 'emailEmployee',
                                 'autofocus' => false,

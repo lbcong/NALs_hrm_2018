@@ -9,7 +9,8 @@ return [
     'non_salary_date'=>'Số ngày nghỉ không lương',
     'last_year_absences_date'=> 'Số ngày phép năm ngoái',
     'msg_content' => [
-        'msg_filter_invalid' => 'Xin hãy chọn năm !!'
+        'msg_filter_invalid' => 'Xin hãy chọn năm !!',
+        'msg_export_fails' => 'Kết xuất file lỗi !!',
     ],
     'confirmation'=>[
         'employee_name'=>'Tên',

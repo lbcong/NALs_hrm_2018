@@ -64,21 +64,31 @@ class AbsenceController extends Controller
         if (!isset($request['number_record_per_page'])) {
             $request['number_record_per_page'] = config('settings.paginate');
         }
-        $absenceService = new \App\Absence\AbsenceService();
-        $absenceService1 = $this->absenceService;
+        if (!isset($request['year_absence'])) {
+            $request['year_absence'] = date('Y');
+        }
+
+        $absenceService = $this->absenceService;
         $month_absences = getArrayMonth();
         $year_absences = $this->absenceService->getArrayYearAbsence();
-        $employees = $this->searchEmployeeService->searchEmployee($request)->orderBy('id', 'asc')->paginate($request['number_record_per_page']);
+        $employees = $this->searchEmployeeService->searchEmployee($request)->orderBy('id', 'asc')
+            ->paginate($request['number_record_per_page']);
         $employees->setPath('');
         $param = (Input::except(['page', 'is_employee']));
-        session()->flashInput($request->input());
-        return view('absences.hr_list', compact('employees', 'param', 'month_absences', 'year_absences','absenceService','absenceService1'));
+//        session()->flashInput($request->input());
+        return view('absences.hr_list', compact('employees', 'param', 'month_absences', 'year_absences','absenceService'));
     }
 
     public function exportAbsenceHR(Request $request)
     {
-        $time = (new \DateTime())->format('Y-m-d H:i:s');
-        return Excel::download(new HRAbsenceExport(null, $request), 'absence-list-' . $time . '.csv');
+            $absences = $request->get('absences');
+            if(!is_null($absences)){
+                $time = (new \DateTime())->format('Y-m-d H:i:s');
+                return Excel::download(new HRAbsenceExport($absences), 'absence-list-' . $time . '.csv');
+            }else{
+                \session()->flash(trans('common.msg_fails'), trans('absence.msg_content.msg_export_fails'));
+                redirect(route('absences-hr'))->withInput();
+            }
     }
 
 

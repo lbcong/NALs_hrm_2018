@@ -87,6 +87,10 @@ class SearchEmployeeServiceImpl extends CommonService implements SearchEmployeeS
                     ->where('endwork_date','<',$dateNow);
             }
         }
+        if(!empty($request['year_absence'])){
+            $year=$request['year_absence'];
+            $query->whereYear('endwork_date','>=',$year);
+        }
 
         $employeesSearch = $query
             ->where('delete_flag', '=', 0);

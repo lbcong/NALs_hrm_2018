@@ -261,3 +261,140 @@ function selectConfirm($id_absence){
             ->where('absence_id',$id_absence)->first();
     return $objConfirm;
 }
+
+function getSalaryDate($absenceService,$employee_id,$listAbsence, $year_absence, $month_absence)
+{
+    $total = $absenceService->totalDateAbsences(
+        $employee_id,
+        $year_absence ,
+        $month_absence);
+
+    $dayoff = $absenceService->numberOfDaysOff(
+        $listAbsence,
+        $year_absence,
+        $month_absence,
+        getAbsenceType(config('settings.status_common.absence_type.salary_date'))
+    );
+    if (($total - $dayoff) < 0) {
+        return $total;
+    } else {
+        return $dayoff;
+    }
+}
+
+function getRemainingDate($absenceService,$employee_id,$listAbsence, $year_absence, $month_absence){
+    $total = $absenceService->totalDateAbsences(
+        $employee_id,
+        $year_absence,
+        $month_absence);
+
+    $dayoff = $absenceService->numberOfDaysOff(
+        $listAbsence,
+        $year_absence,
+        $month_absence,
+        getAbsenceType(config('settings.status_common.absence_type.salary_date'))
+    );
+
+    if (($total - $dayoff) < 0) {
+        return 0;
+    } else {
+        return $total - $dayoff;
+    }
+}
+
+function getSubtractSalaryDate($absenceService,$employee_id,$listAbsence, $year_absence, $month_absence){
+    $total=$absenceService->totalDateAbsences(
+        $employee_id,
+        $year_absence,
+        $month_absence
+    );
+    $dayoff= $absenceService->numberOfDaysOff(
+        $listAbsence,
+        $year_absence,
+        $month_absence,
+        getAbsenceType(config('settings.status_common.absence_type.salary_date'))
+    );
+    if(($total-$dayoff)<0){
+        return $dayoff-$total;
+    }else{
+        return 0;
+    }
+}
+
+function checkExpiredPolicy($employee_id , $year ,$month){
+    $employee = Employee::find($employee_id);
+    $expiry= Carbon::parse($employee->endwork_date);
+    $expiry_year = $expiry->year;
+    $expiry_month = $expiry->month;
+
+    if((int)$year>(int)$expiry_year){
+        return true;
+    }elseif((int)$year===(int)$expiry_year){
+        if(!empty($month) && $month>=$expiry_month){
+            return true;
+        }
+    }
+    return false;
+}
+
+function getJsonObjectAbsenceHrList($employees,$absenceService){
+    $object = [];
+    foreach($employees as $employee){
+        $listAbsence=$absenceService->getListNumberOfDaysOff(
+            $employee->id,empty(request()->get('year_absence'))?date('Y'):request()->get('year_absence'),
+            empty(request()->get('month_absence'))?null:request()->get('month_absence'),
+            getAbsenceStatuses(config('settings.status_common.absence.accepted'))
+        );
+        $item = [];
+        $item['id']=isset($employee->id)? $employee->id: "";
+        $item[trans('common.name.employee_name')]=isset($employee->name)? $employee->name: "-";
+        $item[trans('employee.profile_info.email')]=isset($employee->name)? $employee->email: "-";
+        $item[trans('absence.total_date_absences')]=$absenceService->totalDateAbsences(
+            $employee->id,
+            empty(request()->get('year_absence'))?date('Y'):request()->get('year_absence'),
+            empty(request()->get('month_absence'))?date('m'):request()->get('month_absence')
+        );
+        $item[trans('absence.last_year_absences_date')]=$absenceService->getnumberAbsenceRedundancyByYear(
+            $employee->id,
+            empty(request()->get('year_absence'))?((int)date('Y')-1):((int)request()->get('year_absence')-1)
+        );
+
+        $item[trans('absence.absented_date')]=getSalaryDate(
+            $absenceService,
+            $employee->id,
+            $listAbsence,
+            empty(request()->get('year_absence')) ? date('Y') : request()->get('year_absence'),
+            empty(request()->get('month_absence')) ? null : request()->get('month_absence')
+        ) ;
+
+        $item[trans('absence.non_salary_date')]= $absenceService->numberOfDaysOff(
+            $listAbsence,
+            empty(request()->get('year_absence'))?date('Y'):request()->get('year_absence'),
+            empty(request()->get('month_absence'))?null:request()->get('month_absence'),
+            getAbsenceType(config('settings.status_common.absence_type.non_salary_date'))
+        );
+        $item[trans('absence.insurance_date')]=$absenceService->numberOfDaysOff(
+            $listAbsence,
+            empty(request()->get('year_absence'))?date('Y'):request()->get('year_absence'),
+            empty(request()->get('month_absence'))?null:request()->get('month_absence'),
+            getAbsenceType(config('settings.status_common.absence_type.insurance_date'))
+        );
+        $item[trans('absence.subtract_salary_date')]=getSubtractSalaryDate(
+            $absenceService,
+            $employee->id,
+            $listAbsence,
+            empty(request()->get('year_absence')) ? date('Y') : request()->get('year_absence'),
+            empty(request()->get('month_absence')) ? null : request()->get('month_absence')
+        );
+        $item[trans('absence.remaining_date')]=getRemainingDate(
+            $absenceService,
+            $employee->id,
+            $listAbsence,
+            empty(request()->get('year_absence')) ? date('Y') : request()->get('year_absence'),
+            empty(request()->get('month_absence')) ? null : request()->get('month_absence')
+        );
+
+        $object[]=$item;
+    }
+    return $object;
+}

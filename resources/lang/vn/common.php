@@ -19,6 +19,9 @@ return [
         'next'=>'Sau →',
         'last'=>'Trang cuối →',
     ],
+    'msg_fails' => 'msg_fail',
+    'msg_success' => 'msg_success',
+    'msg_error' => 'msg_error',
     'confirm_message'=>[
         'add_action'=>'Bạn có muốn thêm không?',
         'reset_action'=>'Bạn có muốn làm mới tất cả trường trên form không ?'

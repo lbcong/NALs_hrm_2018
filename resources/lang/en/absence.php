@@ -10,7 +10,8 @@ return [
     'non_salary_date'=>'Non salary date',
     'last_year_absences_date'=> 'Last year absences date',
     'msg_content'=>[
-        'msg_filter_invalid' => 'Please choose year !!'
+        'msg_filter_invalid' => 'Please choose year !!',
+        'msg_export_fails' => 'Export fails !!',
     ],
     'confirmation'=>[
         'employee_name'=>'Name',

@@ -108,9 +108,6 @@ function checkPOProcess(employee_role_selected, employee_name_selected, employee
 
 }
 
-
-
-
 function getEstimateCost(date1, date2, man_power) {
     var salary = 10000000;
     var t1 = new Date(date1);

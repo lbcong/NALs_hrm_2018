@@ -88,14 +88,11 @@ Route::group(['middleware' => 'user'], function () {
         'uses'=>'Absence\AbsenceController@indexHR',
         'as'=>'absences-hr'
     ]);
-    Route::get('absences/hr/export',[
+    Route::post('absences/hr/export',[
         'uses'=>'Absence\AbsenceController@exportAbsenceHR',
         'as'=>'export-absences-hr'
     ]);
-    Route::get('absences/hr/export',[
-        'uses'=>'Absence\AbsenceController@exportAbsenceHR',
-        'as'=>'export-absences-hr'
-    ]);
+
     Route::resource('absences', 'Absence\AbsenceController');
 
     Route::post('projects/checkProcessAjax',[

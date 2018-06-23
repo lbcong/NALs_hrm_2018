@@ -24,6 +24,7 @@
             </ol>
 
         </section>
+
         <section class="content-header">
             <div style="float:right; background-color: #ECF0F5; height: 50px;">
                 <ol class="breadcrumb" style="background-color: #ECF0F5">
@@ -61,7 +62,19 @@
                                 {!! Form::close() !!}
                             </div>
                             <div class="col-md-12" style="width: 100% ; margin-bottom: 1em"></div>
-                            @include('absences._list_absences_hr')
+                            @php
+                                $list_absences = getJsonObjectAbsenceHrList($employees,$absenceService);
+                                view()->share('list_absences',$list_absences);
+                            @endphp
+                            {!! Form::open(
+                                [
+                                'url' =>route('export-absences-hr'),
+                                'method'=>'post',
+                                'id'=>'form_list_absences',
+                                'role'=>'form'
+                                ]) !!}
+                            @include('absences._list_absences_hr',[$list_absences])
+                            {!! Form::close() !!}
                         </div>
                         <!-- /.box-body -->
                     </div>
@@ -79,7 +92,7 @@
             lang.init("absence", language, function () {
                 $('#export_absence_hr').on('click', function (event) {
                     if(confirmExportHR(lang.getString('confirm_export_absence_hr'))){
-                        return true;
+                        $('#form_list_absences').submit();
                     }else{
                         return false;
                     }

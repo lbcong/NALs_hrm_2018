@@ -58,106 +58,76 @@
         }
     </style>
     <tbody class="context-menu list-project">
-    @foreach($employees as $employee)
-        <tr class="employee-menu" id="employee-id-{{$employee->id}}" data-employee-id="{{$employee->id}}">
-            <td>{{ isset($employee->name)? $employee->name: "-" }}</td>
-            <td>{{ isset($employee->name)? $employee->email: "-" }}</td>
-            <td>{{
-            $absenceService->totalDateAbsences(
-            $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence')
-            )
-            }}</td>
-            <td>{{
-                $absenceService1->getnumberAbsenceRedundancyByYear(
-                $employee->id,empty(old('year_absence'))?((int)date('Y')-1):((int)old('year_absence')-1)
-                )
-            }}
-            </td>
-            <td>
-                @php
 
-                    $total=$absenceService->totalDateAbsences(
-                        $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'));
+    @foreach($list_absences as $employee)
+        <tr class="employee-menu" id="employee-id-{{$employee['id']}}" data-employee-id="{{$employee['id']}}">
+            <td
+                    {{checkExpiredPolicy(
+                                $employee['id'],
+                                empty(request()->get('year_absence'))?date('Y'):request()->get('year_absence'),
+                                empty(request()->get('month_absence'))?null:request()->get('month_absence')
+                            )?"style=background-color:red":''
+                    }}
+            >{{ $employee[trans('common.name.employee_name')]}}</td>
 
-                    $dayoff= $absenceService->numberOfDaysOff(
-                            $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'),
-                            empty(old('month_absence'))?null:old('month_absence'),
-                            getAbsenceType(config('settings.status_common.absence_type.salary_date')),
-                            getAbsenceStatuses(config('settings.status_common.absence.accepted'))
-                            );
+            <input  type="hidden"
+                   name="absences[{{$employee['id']}}][{{ trans('common.name.employee_name')}}]"
+                   value="{{$employee[trans('common.name.employee_name')]}}">
 
-                    if(($total-$dayoff)<0){
-                        echo $total;
-                    }else{
-                        echo $dayoff;
-                    }
-                @endphp
-            </td>
-            <td>{{
-                 $absenceService->numberOfDaysOff(
-                $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'),
-                empty(old('month_absence'))?null:old('month_absence'),
-                getAbsenceType(config('settings.status_common.absence_type.non_salary_date')),
-                getAbsenceStatuses(config('settings.status_common.absence.accepted'))
-                )
-             }}
-            </td>
-            <td>
-                {{
-                 $absenceService->numberOfDaysOff(
-                $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'),
-                empty(old('month_absence'))?null:old('month_absence'),
-                getAbsenceType(config('settings.status_common.absence_type.insurance_date')),
-                getAbsenceStatuses(config('settings.status_common.absence.accepted'))
-                )
-             }}
-            </td>
-            <td>
-                @php
-                    $total=$absenceService->totalDateAbsences(
-                        $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'));
+            <td>{{$employee[trans('employee.profile_info.email')]}}</td>
 
-                    $dayoff= $absenceService->numberOfDaysOff(
-                            $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'),
-                            empty(old('month_absence'))?null:old('month_absence'),
-                            getAbsenceType(config('settings.status_common.absence_type.salary_date')),
-                            getAbsenceStatuses(config('settings.status_common.absence.accepted'))
-                            );
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{ trans('employee.profile_info.email')}}]"
+                    value="{{$employee[trans('employee.profile_info.email')]}}">
 
-                    if(($total-$dayoff)<0){
-                        echo $dayoff-$total;
-                    }else{
-                        echo 0;
-                    }
-                @endphp
-            </td>
-            <td>
-                @php
-                    $total=$absenceService->totalDateAbsences(
-                        $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'));
+            <td>{{$employee[trans('absence.total_date_absences')] }}</td>
 
-                    $dayoff= $absenceService->numberOfDaysOff(
-                            $employee->id,empty(old('year_absence'))?date('Y'):old('year_absence'),
-                            empty(old('month_absence'))?null:old('month_absence'),
-                            getAbsenceType(config('settings.status_common.absence_type.salary_date')),
-                            getAbsenceStatuses(config('settings.status_common.absence.accepted'))
-                            );
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{ trans('absence.total_date_absences') }}]"
+                    value="{{$employee[trans('absence.total_date_absences')] }}">
 
-                    if(($total-$dayoff)<0){
-                        echo 0;
-                    }else{
-                        echo $total-$dayoff;
-                    }
-                @endphp
+            <td>{{$employee[trans('absence.last_year_absences_date')]}}</td>
 
-            </td>
-            <ul class="contextMenu" data-employee-id="{{$employee->id}}" hidden>
-                <li><a href={{route('vendors.show',$employee->id)}}><i
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{trans('absence.last_year_absences_date')}}]"
+                    value="{{$employee[trans('absence.last_year_absences_date')]}}">
+
+            <td>{{$employee[trans('absence.absented_date')]}}</td>
+
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{trans('absence.absented_date')}}]"
+                    value="{{$employee[trans('absence.absented_date')]}}">
+
+            <td>{{$employee[trans('absence.non_salary_date')]}}</td>
+
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{trans('absence.non_salary_date')}}]"
+                    value="{{$employee[trans('absence.non_salary_date')]}}">
+
+            <td>{{$employee[trans('absence.insurance_date')]}}</td>
+
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{trans('absence.insurance_date')}}]"
+                    value="{{$employee[trans('absence.insurance_date')]}}">
+
+            <td>{{$employee[trans('absence.subtract_salary_date')]}}</td>
+
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{trans('absence.subtract_salary_date')}}]"
+                    value="{{$employee[trans('absence.subtract_salary_date')]}}">
+
+            <td>{{$employee[trans('absence.remaining_date')]}}</td>
+
+            <input  type="hidden"
+                    name="absences[{{$employee['id']}}][{{trans('absence.remaining_date')}}]"
+                    value="{{$employee[trans('absence.remaining_date')]}}">
+
+            <ul class="contextMenu" data-employee-id="{{$employee['id']}}" hidden>
+                <li><a href={{route('vendors.show',$employee['id'])}}><i
                                 class="fa fa-id-card"></i> {{trans('common.action.view')}}
                     </a></li>
             </ul>
         </tr>
-
     @endforeach
     </tbody>
 </table>
